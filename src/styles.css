@@ -1,0 +1,12 @@
+html,
+body,
+#root,
+.App {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.App {
+  padding: 40px;
+}
