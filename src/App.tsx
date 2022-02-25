@@ -1,4 +1,4 @@
-import { Button, Card, Colors } from "@blueprintjs/core";
+import { Button, Card, Colors, Icon, Text } from "@blueprintjs/core";
 import { useOkno, Okno } from "./features/okno";
 
 export default function App() {
@@ -39,11 +39,27 @@ export default function App() {
             </div>
           </Okno.Titlebar>
           <Okno.Content style={{ padding: "1rem" }}>
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga
-            facere error reiciendis est iste sed quibusdam nemo neque optio
-            ducimus, laborum itaque voluptatem quae ea tempore, animi
-            consequatur porro veniam.
+            <Text className="bp4-running-text">
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga
+              facere error reiciendis est iste sed quibusdam nemo neque optio
+              ducimus, laborum itaque voluptatem quae ea tempore, animi
+              consequatur porro veniam.
+            </Text>
           </Okno.Content>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row-reverse",
+              padding: "0.25rem"
+            }}
+          >
+            <Okno.ResizeHandle
+              as={Icon}
+              size={16}
+              icon="arrow-bottom-right"
+              style={{ color: Colors.GRAY3 }}
+            />
+          </div>
         </Okno.Wrapper>
       ))}
     </div>

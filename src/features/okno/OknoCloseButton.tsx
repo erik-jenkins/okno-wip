@@ -12,7 +12,8 @@ export const OknoCloseButton: React.FC<OknoComponentProps> = ({
   const { closeOkno } = useOkno();
   const { id } = useCurrentOkno();
 
-  const onClick = () => {
+  const onClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.stopPropagation();
     closeOkno(id);
   };
 

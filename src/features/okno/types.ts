@@ -15,6 +15,7 @@ export type Okno = {
   title: string;
   position: Position;
   dimensions: Dimensions;
+  zIndex: number;
 };
 
 export type OknoComponentProps = {

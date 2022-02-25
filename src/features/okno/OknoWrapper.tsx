@@ -5,19 +5,28 @@ import {
   DragMoveEvent,
   useSensor
 } from "@dnd-kit/core";
-import { getEventDetails, OknoComponentProps, OknoEventType } from "./types";
+import {
+  getEventDetails,
+  Okno,
+  OknoComponentProps,
+  OknoEventType
+} from "./types";
 import { OknoMoveSensor } from "./OknoPointerSensor";
 import { CurrentOknoProvider } from "./useCurrentOkno";
 import { useOkno } from "./useOkno";
 
-export const OknoWrapper: React.FC<OknoComponentProps> = ({
+type OknoWrapperProps = OknoComponentProps & {
+  okno: Okno;
+};
+
+export const OknoWrapper: React.FC<OknoWrapperProps> = ({
   okno,
   as,
   style = {},
   children,
   ...rest
 }) => {
-  const { saveOknoPosition, saveOknoDimensions } = useOkno();
+  const { saveOknoPosition, saveOknoDimensions, focusOkno } = useOkno();
   const [tempPosition, setTempPosition] = useState(okno.position);
   const [tempDimensions, setTempDimensions] = useState(okno.dimensions);
   const moveSensor = useSensor(OknoMoveSensor);
@@ -54,27 +63,34 @@ export const OknoWrapper: React.FC<OknoComponentProps> = ({
     }
   };
 
+  const onClick = () => {
+    focusOkno(okno.id);
+  };
+
   const Component = as || "div";
 
   return (
     <CurrentOknoProvider id={okno.id} dimensions={tempDimensions}>
-      <DndContext
-        sensors={[moveSensor]}
-        onDragMove={onDragMove}
-        onDragEnd={onDragEnd}
+      <Component
+        onClick={onClick}
+        style={{
+          position: "absolute",
+          transform: `translate3d(${tempPosition.x}px, ${tempPosition.y}px, 0)`,
+          zIndex: okno.zIndex,
+          width: `${tempDimensions.width}px`,
+          ...style
+        }}
+        {...rest}
       >
-        <Component
-          style={{
-            position: "absolute",
-            transform: `translate3d(${tempPosition.x}px, ${tempPosition.y}px, 0)`,
-            width: `${tempDimensions.width}px`,
-            ...style
-          }}
-          {...rest}
+        <DndContext
+          sensors={[moveSensor]}
+          onDragStart={onClick}
+          onDragMove={onDragMove}
+          onDragEnd={onDragEnd}
         >
           {children}
-        </Component>
-      </DndContext>
+        </DndContext>
+      </Component>
     </CurrentOknoProvider>
   );
 };

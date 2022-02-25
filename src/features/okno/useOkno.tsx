@@ -8,6 +8,7 @@ type OknoContext = {
   createOkno: (title: string) => void;
   saveOknoPosition: (id: string, newPosition: Position) => void;
   saveOknoDimensions: (id: string, newDimensions: Dimensions) => void;
+  focusOkno: (id: string) => void;
   closeOkno: (id: string) => void;
 };
 
@@ -15,6 +16,7 @@ const oknoContext = createContext({} as OknoContext);
 
 export const OknoProvider: React.FC = ({ children }) => {
   const [oknoMap, setOknoMap] = useState(Map<string, Okno>());
+  const [maxZIndex, setMaxZIndex] = useState(1);
 
   const createOkno = (title: string) => {
     const id = uuid();
@@ -22,7 +24,8 @@ export const OknoProvider: React.FC = ({ children }) => {
       id,
       title,
       position: { x: 100, y: 100 },
-      dimensions: { width: 600, height: 400 }
+      dimensions: { width: 600, height: 400 },
+      zIndex: 0
     });
     setOknoMap(newOknoMap);
   };
@@ -37,6 +40,17 @@ export const OknoProvider: React.FC = ({ children }) => {
     setOknoMap(oknoMap.setIn([id, "dimensions"], newDimensions));
   };
 
+  const focusOkno = (id: string) => {
+    if (!oknoMap.has(id)) return;
+    if (oknoMap.get(id)?.zIndex === maxZIndex) return;
+
+    const newZIndex = maxZIndex + 1;
+    setOknoMap(oknoMap.setIn([id, "zIndex"], newZIndex));
+    setMaxZIndex((old) => old + 1);
+
+    // TODO: if zIndex hits a certain threshold, reset all zIndices
+  };
+
   const closeOkno = (id: string) => {
     setOknoMap(oknoMap.delete(id));
   };
@@ -48,6 +62,7 @@ export const OknoProvider: React.FC = ({ children }) => {
         createOkno,
         saveOknoPosition,
         saveOknoDimensions,
+        focusOkno,
         closeOkno
       }}
     >
