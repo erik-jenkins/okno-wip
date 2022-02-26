@@ -16,6 +16,7 @@ export type Okno = {
   position: Position;
   dimensions: Dimensions;
   zIndex: number;
+  isHidden: boolean;
 };
 
 export type OknoComponentProps = {

@@ -2,18 +2,62 @@ import { Button, Card, Colors, Icon, Text } from "@blueprintjs/core";
 import { useOkno, Okno } from "./features/okno";
 
 export default function App() {
-  const { oknos, createOkno } = useOkno();
+  const { getVisibleOknos, getHiddenOknos, createOkno } = useOkno();
 
   const handleCreateWindowClick = () => {
     createOkno(`wowee`);
   };
 
   return (
-    <div className="App bp4-dark" style={{ background: Colors.DARK_GRAY5 }}>
-      <Button onClick={handleCreateWindowClick} intent="primary">
-        Create window
-      </Button>
-      {oknos?.map((okno) => (
+    <div
+      className="App bp4-dark"
+      style={{
+        background: Colors.DARK_GRAY5,
+        display: "flex",
+        flexDirection: "column"
+      }}
+    >
+      <main style={{ flexGrow: 1, padding: "1rem" }}>
+        <Button onClick={handleCreateWindowClick} intent="primary">
+          Create window
+        </Button>
+      </main>
+
+      <footer
+        style={{
+          width: "100vw",
+          minHeight: "3.5rem",
+          padding: "0.5rem",
+          boxSizing: "border-box",
+          background: Colors.DARK_GRAY4,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between"
+        }}
+      >
+        <div
+          className="window-list"
+          style={{
+            flexGrow: 1,
+            flexWrap: "wrap",
+            display: "flex",
+            gap: "0.25rem"
+          }}
+        >
+          {getHiddenOknos().map((okno) => (
+            <Okno.ShowButton
+              key={okno.id}
+              id={okno.id}
+              as={Button}
+              text={okno.id}
+              rightIcon="arrow-top-right"
+            />
+          ))}
+        </div>
+        <div className="controls">controls</div>
+      </footer>
+      {getVisibleOknos().map((okno) => (
         <Okno.Wrapper
           key={okno.id}
           okno={okno}
@@ -30,10 +74,12 @@ export default function App() {
               alignItems: "center"
             }}
           >
-            <div className="title">{okno.title}</div>
+            <div className="title">
+              <Text ellipsize>{okno.id}</Text>
+            </div>
             <div className="controls">
               {/* TODO: Okno components to close and minimize window */}
-              <Button minimal icon="minus" />
+              <Okno.HideButton as={Button} minimal icon="minus" />
               <Button minimal icon="maximize" />
               <Okno.CloseButton as={Button} minimal icon="cross" />
             </div>
