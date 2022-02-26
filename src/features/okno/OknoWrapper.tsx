@@ -1,25 +1,45 @@
-import React, { useState } from "react";
+import React, { MutableRefObject, useRef, useState } from "react";
 import {
   DndContext,
   DragEndEvent,
   DragMoveEvent,
-  DragOverlay,
   useSensor
 } from "@dnd-kit/core";
-import {
-  restrictToHorizontalAxis,
-  restrictToParentElement,
-  restrictToWindowEdges
-} from "@dnd-kit/modifiers";
 import {
   getEventDetails,
   Okno,
   OknoComponentProps,
-  OknoEventType
+  OknoEventType,
+  Position,
+  Rectangle
 } from "./types";
 import { OknoMoveSensor } from "./OknoPointerSensor";
 import { CurrentOknoProvider } from "./useCurrentOkno";
 import { useOkno } from "./useOkno";
+
+const getBoundedOknoPosition = (
+  oknoRect: Rectangle,
+  boundingRect: Rectangle
+): Position => {
+  let boundedX = Math.max(boundingRect.position.x, oknoRect.position.x);
+  if (boundedX + oknoRect.dimensions.width > boundingRect.dimensions.width)
+    boundedX =
+      boundingRect.position.x +
+      boundingRect.dimensions.width -
+      oknoRect.dimensions.width;
+
+  let boundedY = Math.max(boundingRect.position.y, oknoRect.position.y);
+  if (boundedY + oknoRect.dimensions.height > boundingRect.dimensions.height)
+    boundedY =
+      boundingRect.position.y +
+      boundingRect.dimensions.height -
+      oknoRect.dimensions.height;
+
+  return {
+    x: boundedX,
+    y: boundedY
+  };
+};
 
 type OknoWrapperProps = OknoComponentProps & {
   okno: Okno;
@@ -32,20 +52,41 @@ export const OknoWrapper: React.FC<OknoWrapperProps> = ({
   children,
   ...rest
 }) => {
-  const { saveOknoPosition, saveOknoDimensions, focusOkno } = useOkno();
+  const {
+    saveOknoPosition,
+    saveOknoDimensions,
+    focusOkno,
+    boundingRect
+  } = useOkno();
   const [tempPosition, setTempPosition] = useState(okno.position);
   const [tempDimensions, setTempDimensions] = useState(okno.dimensions);
   const moveSensor = useSensor(OknoMoveSensor);
+  const oknoRef = useRef() as MutableRefObject<HTMLDivElement>;
 
   const onDragMove = (e: DragMoveEvent) => {
     const { eventType, deltaX, deltaY } = getEventDetails(e);
 
     switch (eventType) {
       case OknoEventType.Move:
-        setTempPosition({
-          x: okno.position.x + deltaX,
-          y: Math.max(okno.position.y + deltaY, 0)
-        });
+        const {
+          width: refWidth,
+          height: refHeight
+        } = oknoRef.current.getBoundingClientRect();
+        const boundedOknoPosition = getBoundedOknoPosition(
+          {
+            position: {
+              x: okno.position.x + deltaX,
+              y: okno.position.y + deltaY
+            },
+            dimensions: {
+              width: refWidth,
+              height: refHeight
+            }
+          },
+          boundingRect
+        );
+
+        setTempPosition(boundedOknoPosition);
         break;
       case OknoEventType.Resize:
         setTempDimensions({
@@ -77,27 +118,28 @@ export const OknoWrapper: React.FC<OknoWrapperProps> = ({
 
   return (
     <CurrentOknoProvider id={okno.id} dimensions={tempDimensions}>
-      <Component
-        onClick={onClick}
-        style={{
-          position: "absolute",
-          transform: `translate3d(${tempPosition.x}px, ${tempPosition.y}px, 0)`,
-          zIndex: okno.zIndex,
-          width: `${tempDimensions.width}px`,
-          ...style
-        }}
-        {...rest}
+      <DndContext
+        sensors={[moveSensor]}
+        onDragStart={onClick}
+        onDragMove={onDragMove}
+        onDragEnd={onDragEnd}
       >
-        <DndContext
-          sensors={[moveSensor]}
-          onDragStart={onClick}
-          onDragMove={onDragMove}
-          onDragEnd={onDragEnd}
-          // modifiers={[restrictToWindowEdges]}
+        <Component
+          onClick={onClick}
+          style={{
+            position: "absolute",
+            transform: `translate3d(${tempPosition.x}px, ${tempPosition.y}px, 0)`,
+            zIndex: okno.zIndex,
+            width: `${tempDimensions.width}px`,
+            ...style
+          }}
+          {...rest}
         >
-          {children}
-        </DndContext>
-      </Component>
+          <div style={{ height: "100%", width: "100" }} ref={oknoRef}>
+            {children}
+          </div>
+        </Component>
+      </DndContext>
     </CurrentOknoProvider>
   );
 };

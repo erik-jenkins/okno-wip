@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { Map } from "immutable";
 import { v4 as uuid } from "uuid";
-import { Dimensions, Okno, Position } from "./types";
+import { Dimensions, Okno, Position, Rectangle } from "./types";
 
 type OknoContext = {
   getVisibleOknos: () => Okno[];
@@ -13,6 +13,8 @@ type OknoContext = {
   showOkno: (id: string) => void;
   focusOkno: (id: string) => void;
   closeOkno: (id: string) => void;
+  setBoundingRect: (rect: Rectangle) => void;
+  boundingRect: Rectangle;
 };
 
 const oknoContext = createContext({} as OknoContext);
@@ -20,6 +22,16 @@ const oknoContext = createContext({} as OknoContext);
 export const OknoProvider: React.FC = ({ children }) => {
   const [oknoMap, setOknoMap] = useState(Map<string, Okno>());
   const [maxZIndex, setMaxZIndex] = useState(1);
+  const [boundingRect, setBoundingRect] = useState<Rectangle>({
+    position: {
+      x: 0,
+      y: 0
+    },
+    dimensions: {
+      width: window.innerWidth,
+      height: window.innerHeight
+    }
+  });
 
   const getVisibleOknos = () => {
     return Array.from(oknoMap.filter((okno) => !okno.isHidden).values());
@@ -96,7 +108,9 @@ export const OknoProvider: React.FC = ({ children }) => {
         hideOkno,
         showOkno,
         focusOkno,
-        closeOkno
+        closeOkno,
+        boundingRect,
+        setBoundingRect
       }}
     >
       {children}

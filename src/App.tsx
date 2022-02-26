@@ -18,9 +18,11 @@ export default function App() {
       }}
     >
       <main style={{ flexGrow: 1, padding: "1rem" }}>
-        <Button onClick={handleCreateWindowClick} intent="primary">
-          Create window
-        </Button>
+        <Okno.Bounds style={{ border: `1px dashed ${Colors.GRAY1}` }}>
+          <Button onClick={handleCreateWindowClick} intent="primary">
+            Create window
+          </Button>
+        </Okno.Bounds>
       </main>
 
       <footer
@@ -67,18 +69,17 @@ export default function App() {
         >
           <Okno.Titlebar
             style={{
-              padding: " 0.25rem 0.5rem",
+              padding: "0.25rem 0.5rem",
               background: Colors.DARK_GRAY3,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center"
             }}
           >
-            <div className="title">
+            <div className="title" style={{ minWidth: "20px" }}>
               <Text ellipsize>{okno.id}</Text>
             </div>
-            <div className="controls">
-              {/* TODO: Okno components to close and minimize window */}
+            <div className="controls" style={{ display: "flex" }}>
               <Okno.HideButton as={Button} minimal icon="minus" />
               <Button minimal icon="maximize" />
               <Okno.CloseButton as={Button} minimal icon="cross" />

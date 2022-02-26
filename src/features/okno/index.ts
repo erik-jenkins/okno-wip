@@ -5,6 +5,7 @@ import { OknoTitlebar } from "./OknoTitlebar";
 import { OknoCloseButton } from "./OknoCloseButton";
 import { OknoWrapper } from "./OknoWrapper";
 import { OknoShowButton } from "./OknoShowButton";
+import { OknoBounds } from "./OknoBounds";
 
 export const Okno = {
   Wrapper: OknoWrapper,
@@ -13,7 +14,8 @@ export const Okno = {
   CloseButton: OknoCloseButton,
   Content: OknoContent,
   ResizeHandle: OknoResizeHandle,
-  ShowButton: OknoShowButton
+  ShowButton: OknoShowButton,
+  Bounds: OknoBounds
 };
 
 export { useOkno, OknoProvider } from "./useOkno";

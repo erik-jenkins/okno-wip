@@ -10,6 +10,11 @@ export type Dimensions = {
   height: number;
 };
 
+export type Rectangle = {
+  position: Position;
+  dimensions: Dimensions;
+};
+
 export type Okno = {
   id: string;
   title: string;
