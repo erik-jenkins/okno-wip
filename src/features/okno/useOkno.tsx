@@ -4,7 +4,6 @@ import { v4 as uuid } from "uuid";
 import { Dimensions, Okno, Position } from "./types";
 
 type OknoContext = {
-  oknos: Okno[];
   getVisibleOknos: () => Okno[];
   getHiddenOknos: () => Okno[];
   createOkno: (title: string) => void;
@@ -41,7 +40,7 @@ export const OknoProvider: React.FC = ({ children }) => {
       isHidden: false
     });
     setMaxZIndex((old) => old + 1);
-    setOknoMap(newOknoMap);
+    setOknoMap(newOknoMap.sort((a, b) => a.zIndex - b.zIndex));
   };
 
   const saveOknoPosition = (id: string, newPosition: Position) => {
@@ -56,13 +55,19 @@ export const OknoProvider: React.FC = ({ children }) => {
 
   const hideOkno = (id: string) => {
     if (!oknoMap.has(id)) return;
-    setOknoMap(oknoMap.setIn([id, "isHidden"], true));
+    setOknoMap(
+      oknoMap.setIn([id, "isHidden"], true).sort((a, b) => a.zIndex - b.zIndex)
+    );
   };
 
   const showOkno = (id: string) => {
     console.log(id);
     if (!oknoMap.has(id)) return;
-    setOknoMap(oknoMap.setIn([id, "isHidden"], false));
+    const newOkno = oknoMap
+      .setIn([id, "isHidden"], false)
+      .setIn([id, "zIndex"], maxZIndex + 1);
+    setOknoMap(newOkno);
+    setMaxZIndex((old) => old + 1);
   };
 
   const closeOkno = (id: string) => {
@@ -74,8 +79,8 @@ export const OknoProvider: React.FC = ({ children }) => {
     if (!oknoMap.has(id)) return;
     if (oknoMap.get(id)?.zIndex === maxZIndex) return;
 
-    const newZIndex = maxZIndex + 1;
-    setOknoMap(oknoMap.setIn([id, "zIndex"], newZIndex));
+    const newOknoMap = oknoMap.setIn([id, "zIndex"], maxZIndex + 1);
+    setOknoMap(newOknoMap);
     setMaxZIndex((old) => old + 1);
 
     // TODO: if zIndex hits a certain threshold, reset all zIndices
@@ -84,7 +89,6 @@ export const OknoProvider: React.FC = ({ children }) => {
   return (
     <oknoContext.Provider
       value={{
-        oknos: Array.from(oknoMap.values()),
         getVisibleOknos,
         getHiddenOknos,
         createOkno,
