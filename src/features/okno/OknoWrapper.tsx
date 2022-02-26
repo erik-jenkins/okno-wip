@@ -3,8 +3,14 @@ import {
   DndContext,
   DragEndEvent,
   DragMoveEvent,
+  DragOverlay,
   useSensor
 } from "@dnd-kit/core";
+import {
+  restrictToHorizontalAxis,
+  restrictToParentElement,
+  restrictToWindowEdges
+} from "@dnd-kit/modifiers";
 import {
   getEventDetails,
   Okno,
@@ -38,7 +44,7 @@ export const OknoWrapper: React.FC<OknoWrapperProps> = ({
       case OknoEventType.Move:
         setTempPosition({
           x: okno.position.x + deltaX,
-          y: okno.position.y + deltaY
+          y: Math.max(okno.position.y + deltaY, 0)
         });
         break;
       case OknoEventType.Resize:
@@ -87,6 +93,7 @@ export const OknoWrapper: React.FC<OknoWrapperProps> = ({
           onDragStart={onClick}
           onDragMove={onDragMove}
           onDragEnd={onDragEnd}
+          // modifiers={[restrictToWindowEdges]}
         >
           {children}
         </DndContext>

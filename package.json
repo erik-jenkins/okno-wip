@@ -7,6 +7,7 @@
   "dependencies": {
     "@blueprintjs/core": "4.0.0-beta.14",
     "@dnd-kit/core": "5.0.1",
+    "@dnd-kit/modifiers": "5.0.0",
     "@types/uuid": "8.3.4",
     "immutable": "4.0.0",
     "react": "17.0.2",

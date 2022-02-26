@@ -61,7 +61,6 @@ export const OknoProvider: React.FC = ({ children }) => {
   };
 
   const showOkno = (id: string) => {
-    console.log(id);
     if (!oknoMap.has(id)) return;
     const newOkno = oknoMap
       .setIn([id, "isHidden"], false)
